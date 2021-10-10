@@ -1,13 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { DiskStorageService } from 'src/providers/disk-storage/disk-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserAvatarDto } from './dto/update-user-avatar.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private diskStorage: DiskStorageService,
+  ) {}
 
   async create({ email, name, password, phone, roles }: CreateUserDto) {
     const rolesExists = await this.prisma.role.findMany({
@@ -72,6 +77,27 @@ export class UsersService {
     });
 
     return new UserEntity(user);
+  }
+
+  async updateAvatar({ id, avatarFileName }: UpdateUserAvatarDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { avatar: true },
+    });
+
+    if (user.avatar) {
+      await this.diskStorage.deleteFile(user.avatar);
+    }
+
+    const fileName = await this.diskStorage.saveFile(avatarFileName);
+
+    const userUpdated = await this.prisma.user.update({
+      where: { id },
+      data: { avatar: fileName },
+      include: { roles: true },
+    });
+
+    return new UserEntity(userUpdated);
   }
 
   async remove(id: number) {

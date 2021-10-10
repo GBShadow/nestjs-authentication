@@ -16,6 +16,7 @@ model User {
   password  String
   name      String
   phone     String
+  avatar    String?
   roles     Role[]   @relation("_UserRole")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

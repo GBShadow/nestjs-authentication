@@ -10,6 +10,7 @@ import { SendMailConsumer } from './jobs/sendMail-consumer';
 import { SendMailProducerService } from './jobs/sendMail-producer-service';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { DiskStorageService } from './providers/disk-storage/disk-storage.service';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { RolesModule } from './roles/roles.module';
     RolesModule,
     UsersModule,
   ],
-  providers: [SendMailProducerService, SendMailConsumer],
+  providers: [SendMailProducerService, SendMailConsumer, DiskStorageService],
 })
 export class AppModule {
   constructor(@InjectQueue('sendMail-queue') private sendMailQueue: Queue) {}

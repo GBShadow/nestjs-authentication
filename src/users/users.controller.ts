@@ -9,11 +9,17 @@ import {
   UseInterceptors,
   ClassSerializerInterceptor,
   ParseIntPipe,
+  Patch,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
+import uploadConfig from '../config/upload';
+
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -23,7 +29,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {
     return this.usersService.findAll();
@@ -39,7 +44,19 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('avatar', uploadConfig))
+  updateAvatar(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    return this.usersService.updateAvatar({
+      id,
+      avatarFileName: avatar.filename,
+    });
   }
 
   @Delete(':id')

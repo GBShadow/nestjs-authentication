@@ -1,13 +1,25 @@
-import { Controller, Post, Body } from '@nestjs/common';
-import { SessionsService } from './sessions.service';
+import {
+  Body,
+  Controller,
+  Post,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { CreateSessionDto } from './dto/create-session.dto';
+import { SessionsService } from './sessions.service';
 
 @Controller('sessions')
+@UseInterceptors(ClassSerializerInterceptor)
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 
   @Post()
-  create(@Body() createSessionDto: CreateSessionDto) {
-    return this.sessionsService.create(createSessionDto);
+  async create(@Body() { email, password }: CreateSessionDto) {
+    const { user, token } = await this.sessionsService.create({
+      email,
+      password,
+    });
+
+    return { user, token };
   }
 }

@@ -5,18 +5,19 @@ import { JwtModule } from '@nestjs/jwt';
 import { SessionsService } from './sessions.service';
 import { SessionsController } from './sessions.controller';
 import { UsersModule } from '../users.module';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    PassportModule,
     UsersModule,
+    PassportModule,
     JwtModule.register({
       privateKey: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '60s' },
     }),
   ],
   controllers: [SessionsController],
-  providers: [SessionsService],
+  providers: [SessionsService, JwtStrategy],
 })
 export class SessionsModule {}

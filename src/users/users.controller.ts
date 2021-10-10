@@ -11,6 +11,7 @@ import {
   ParseIntPipe,
   Patch,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,9 +19,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import uploadConfig from '../config/upload';
+import { AuthGuard } from '@nestjs/passport';
 
-@UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
+@UseGuards(AuthGuard('jwt'))
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

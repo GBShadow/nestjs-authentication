@@ -53,6 +53,15 @@ export class UsersService {
     return new UserEntity(user);
   }
 
+  async findByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      include: { roles: true },
+    });
+
+    return user;
+  }
+
   async update(
     id: number,
     { email, name, password, phone, roles }: UpdateUserDto,

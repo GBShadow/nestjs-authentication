@@ -1,6 +1,8 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { BullModule, InjectQueue } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 import { MiddlewareBuilder } from '@nestjs/core';
 import { Queue } from 'bull';
@@ -11,10 +13,15 @@ import { SendMailProducerService } from './jobs/sendMail-producer-service';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { DiskStorageService } from './providers/disk-storage/disk-storage.service';
+import { SessionsModule } from './users/sessions/sessions.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     BullModule.forRoot({
       redis: {
         host: 'localhost',
@@ -36,8 +43,17 @@ import { DiskStorageService } from './providers/disk-storage/disk-storage.servic
     }),
     RolesModule,
     UsersModule,
+    SessionsModule,
   ],
-  providers: [SendMailProducerService, SendMailConsumer, DiskStorageService],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    SendMailProducerService,
+    SendMailConsumer,
+    DiskStorageService,
+  ],
 })
 export class AppModule {
   constructor(@InjectQueue('sendMail-queue') private sendMailQueue: Queue) {}

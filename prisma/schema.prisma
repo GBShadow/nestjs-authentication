@@ -18,6 +18,7 @@ model User {
   phone     String
   avatar    String?
   roles     Role[]   @relation("_UserRole")
+  active    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,4 +30,15 @@ model Role {
   users       User[]   @relation("_UserRole")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  email     String?
+  token     String
+  type      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

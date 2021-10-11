@@ -1,15 +1,10 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UseInterceptors,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { SessionsService } from './sessions.service';
 
 @Controller('sessions')
-@UseInterceptors(ClassSerializerInterceptor)
+@ApiTags('sessions')
 export class SessionsController {
   constructor(private readonly sessionsService: SessionsService) {}
 

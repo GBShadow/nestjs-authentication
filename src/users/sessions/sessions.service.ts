@@ -1,15 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from '../entities/user.entity';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 
 @Injectable()
 export class SessionsService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @Inject(REQUEST) private readonly request: Request,
   ) {}
 
   async create({ email, password }: CreateSessionDto) {

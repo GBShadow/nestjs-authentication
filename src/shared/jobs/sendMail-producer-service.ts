@@ -1,13 +1,17 @@
 import { InjectQueue } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
-import { CreateUserDTO } from 'src/create-user/create-user-dto';
+
+export type ISendMailDTO = {
+  name: string;
+  email: string;
+};
 
 @Injectable()
 class SendMailProducerService {
   constructor(@InjectQueue('sendMail-queue') private queue: Queue) {}
 
-  async sendMail(createUserDTO: CreateUserDTO) {
+  async sendMail(createUserDTO: ISendMailDTO) {
     await this.queue.add('sendMail-job', createUserDTO, {
       // options
     });

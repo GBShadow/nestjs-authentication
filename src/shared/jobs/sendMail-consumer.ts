@@ -1,4 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
+import { getTestMessageUrl } from 'nodemailer';
+
 import {
   OnQueueActive,
   OnQueueCompleted,
@@ -7,22 +9,27 @@ import {
   Processor,
 } from '@nestjs/bull';
 import { Job } from 'bull';
-import { CreateUserDTO } from 'src/create-user/create-user-dto';
+import { ISendMailDTO } from './sendMail-producer-service';
 
 @Processor('sendMail-queue')
 class SendMailConsumer {
   constructor(private mailService: MailerService) {}
 
   @Process('sendMail-job')
-  async sendMailJob(job: Job<CreateUserDTO>) {
+  async sendMailJob(job: Job<ISendMailDTO>) {
     const { email, name } = job.data;
 
-    await this.mailService.sendMail({
+    const message = await this.mailService.sendMail({
       to: email,
       from: 'Equipe GBS <gbs@contato.com>',
       subject: 'Seja bem vindo(a)',
       text: `Olá ${name}, seu cadastro foi realizado com sucesso, seja bem vindo(a).`,
     });
+
+    const previewURL = getTestMessageUrl(message);
+
+    console.log('Message sent: %s', message.messageId);
+    console.log('Preview URL: %s', previewURL);
   }
 
   @OnQueueCompleted()

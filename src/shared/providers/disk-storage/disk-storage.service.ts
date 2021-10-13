@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { promises } from 'fs';
 import { resolve } from 'path';
 
-import uploadConfig from '../../config/upload';
+import uploadConfig from '../../../config/upload';
 
 @Injectable()
 export class DiskStorageService {

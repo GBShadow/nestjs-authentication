@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/shared/database/prisma/prisma.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -8,6 +12,14 @@ export class RolesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create({ name, description }: CreateRoleDto) {
+    const roleAlreadyExist = await this.prisma.role.findUnique({
+      where: { name: name.toLocaleUpperCase() },
+    });
+
+    if (roleAlreadyExist) {
+      throw new BadRequestException('Role already exists');
+    }
+
     const role = await this.prisma.role.create({
       data: { name, description },
     });
@@ -24,20 +36,37 @@ export class RolesService {
   async findOne(id: number) {
     const role = await this.prisma.role.findUnique({ where: { id } });
 
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+
     return role;
   }
 
   async update(id: number, { name, description }: UpdateRoleDto) {
-    const role = await this.prisma.role.update({
+    const role = await this.prisma.role.findUnique({ where: { id } });
+
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+
+    const roleUpdated = await this.prisma.role.update({
       where: { id },
       data: { name, description },
     });
 
-    return role;
+    return roleUpdated;
   }
 
   async remove(id: number) {
+    const role = await this.prisma.role.findUnique({ where: { id } });
+
+    if (!role) {
+      throw new NotFoundException('Role not found.');
+    }
+
     await this.prisma.role.delete({ where: { id } });
+
     return;
   }
 }

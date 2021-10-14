@@ -8,8 +8,8 @@ import { PrismaService } from 'src/shared/database/prisma/prisma.service';
 import { SendMailProducerService } from 'src/shared/jobs/sendMail-producer-service';
 import { DiskStorageService } from 'src/shared/providers/disk-storage/disk-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserAvatarDto } from './dto/update-user-avatar.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserAvatar } from './interfaces/update-user-avatar';
 
 @Injectable()
 export class UsersService {
@@ -140,14 +140,14 @@ export class UsersService {
     return userUpdated;
   }
 
-  async updateAvatar({ id, avatarFileName }: UpdateUserAvatarDto) {
+  async updateAvatar({ id, avatar }: UpdateUserAvatar) {
     const user = await this.findById(id);
 
     if (user.avatar) {
       await this.diskStorage.deleteFile(user.avatar);
     }
 
-    const fileName = await this.diskStorage.saveFile(avatarFileName);
+    const fileName = await this.diskStorage.saveFile(avatar.filename);
 
     const userUpdated = await this.prisma.user.update({
       where: { id },

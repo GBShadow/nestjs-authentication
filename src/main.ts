@@ -2,6 +2,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as express from 'express';
+import uploadConfig from './config/upload';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -20,6 +22,8 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
   );
+
+  app.use('/files', express.static(uploadConfig.uploadsFolder));
 
   await app.listen(3333);
 }

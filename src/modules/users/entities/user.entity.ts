@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { Exclude, Expose } from 'class-transformer';
-import { Role } from 'src/modules/roles/entities/role.entity';
+import { RoleEntity } from 'src/modules/roles/entities/role.entity';
 
 export class UserEntity implements User {
   @ApiProperty()
@@ -31,8 +31,8 @@ export class UserEntity implements User {
     return `${process.env.APP_API_URL}/files/${this.avatar}`;
   }
 
-  @ApiProperty({ type: Role, isArray: true })
-  roles: Role[];
+  @ApiProperty({ type: RoleEntity, isArray: true })
+  roles: RoleEntity[];
 
   @ApiProperty()
   createdAt: Date;

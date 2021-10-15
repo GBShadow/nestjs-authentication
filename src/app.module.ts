@@ -4,9 +4,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { DiskStorageService } from './shared/providers/disk-storage/disk-storage.service';
 import { SessionsModule } from './modules/users/sessions/sessions.module';
-import { JobsModule } from './shared/jobs/jobs.module';
 
 @Module({
   imports: [
@@ -15,7 +13,6 @@ import { JobsModule } from './shared/jobs/jobs.module';
       ttl: 60,
       limit: 10,
     }),
-    JobsModule,
     RolesModule,
     UsersModule,
     SessionsModule,
@@ -25,7 +22,6 @@ import { JobsModule } from './shared/jobs/jobs.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    DiskStorageService,
   ],
 })
 export class AppModule {}

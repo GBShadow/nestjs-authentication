@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { compare, hash } from 'bcrypt';
 import { PrismaService } from 'src/shared/database/prisma/prisma.service';
-import { SendMailProducerService } from 'src/shared/jobs/sendMail-producer-service';
+import { SendMailProducerService } from 'src/shared/jobs/sendMail/sendMail-producer-service';
 import { DiskStorageService } from 'src/shared/providers/disk-storage/disk-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserAvatar } from './interfaces/update-user-avatar';
+import templateConfig from '../../config/templateEmail';
 
 @Injectable()
 export class UsersService {
@@ -48,7 +49,16 @@ export class UsersService {
       include: { roles: true },
     });
 
-    this.sendMailService.sendMail({ name, email });
+    this.sendMailService.sendMail({
+      to: { name: user.name, email: user.email },
+      subject: '[Equipe] Confirmação de email',
+      templateData: {
+        file: templateConfig.emailConfirmation,
+        variables: {
+          name: user.name,
+        },
+      },
+    });
 
     return user;
   }

@@ -4,7 +4,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { SessionsModule } from './modules/users/sessions/sessions.module';
+import { SessionsModule } from './modules/sessions/sessions.module';
+import { TokenModule } from './modules/token/token.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SessionsModule } from './modules/users/sessions/sessions.module';
     RolesModule,
     UsersModule,
     SessionsModule,
+    TokenModule,
   ],
   providers: [
     {

@@ -1,5 +1,5 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../users.service';
+import { UsersService } from '../users/users.service';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -19,6 +19,10 @@ export class SessionsService {
 
     if (!user) {
       throw new UnauthorizedException('Incorrect e-mail/password combination');
+    }
+
+    if (!user.active) {
+      throw new UnauthorizedException('Email not confirmed');
     }
 
     const isPasswordValid = compareSync(password, user.password);

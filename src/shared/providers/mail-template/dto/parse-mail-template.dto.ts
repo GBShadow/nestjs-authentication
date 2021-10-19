@@ -1,8 +1,8 @@
 export default interface MailTemplateProviderDTO {
   file: string;
-  variables: IVariables;
+  variables: Variables;
 }
 
-interface IVariables {
+interface Variables {
   [key: string]: string | number;
 }

@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateUserAvatar } from './interfaces/update-user-avatar';
 import templateConfig from '../../config/templateEmail';
+import { TokenService } from '../token/token.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +19,7 @@ export class UsersService {
     private prisma: PrismaService,
     private diskStorage: DiskStorageService,
     private sendMailService: SendMailProducerService,
+    private tokenService: TokenService,
   ) {}
 
   async create({ email, name, password, phone, roles }: CreateUserDto) {
@@ -49,6 +51,11 @@ export class UsersService {
       include: { roles: true },
     });
 
+    const { token } = await this.tokenService.generate({
+      user_id: user.id,
+      type: 'ConfirmationUser',
+    });
+
     this.sendMailService.sendMail({
       to: { name: user.name, email: user.email },
       subject: '[Equipe] Confirmação de email',
@@ -56,6 +63,7 @@ export class UsersService {
         file: templateConfig.emailConfirmation,
         variables: {
           name: user.name,
+          token,
         },
       },
     });
